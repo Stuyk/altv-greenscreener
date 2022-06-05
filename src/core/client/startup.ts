@@ -4,7 +4,7 @@ import { AthenaBuffer } from '../shared/athenaBuffer';
 
 alt.onServer('log:Console', handleLogConsole);
 
-// native.requestAnimDict('nm@hands');
+native.requestAnimDict('nm@hands');
 native.requestAnimDict('mp_character_creation@lineup@male_a');
 
 function handleLogConsole(msg: string) {
@@ -29,7 +29,7 @@ alt.on('keyup', async (key: number) => {
     const fwdPos = {
         x: alt.Player.local.pos.x + fwd.x * 1.2,
         y: alt.Player.local.pos.y + fwd.y * 1.2,
-        z: alt.Player.local.pos.z + 0.65,
+        z: alt.Player.local.pos.z + 0.15,
     };
 
     const cam = native.createCamWithParams(
@@ -40,28 +40,16 @@ alt.on('keyup', async (key: number) => {
         0,
         0,
         0,
-        30,
+        40,
         true,
         0
     );
 
-    native.pointCamAtCoord(cam, alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z + 0.65);
+    native.pointCamAtCoord(cam, alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z + 0.15);
     native.setCamActive(cam, true);
     native.renderScriptCams(true, false, 0, true, false, 0);
 
-    // native.taskPlayAnim(
-    //     alt.Player.local.scriptID,
-    //     'mp_character_creation@lineup@male_a',
-    //     'loop_raised',
-    //     8.0,
-    //     8.0,
-    //     -1,
-    //     49,
-    //     0,
-    //     false,
-    //     false,
-    //     false
-    // );
+    // native.taskPlayAnim(alt.Player.local.scriptID, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 49, 0, false, false, false);
 
     native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z + 0.01, false, false, false);
     native.freezeEntityPosition(alt.Player.local.scriptID, true);
@@ -78,7 +66,7 @@ alt.on('keyup', async (key: number) => {
 });
 
 alt.onServer('takeScreenshot', async () => {
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z + 0.01, false, false, false);
+    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z + 0.05, false, false, false);
     native.freezeEntityPosition(alt.Player.local.scriptID, true);
     native.setEntityRotation(
         alt.Player.local.scriptID,
