@@ -12,26 +12,37 @@ const pendingScreenshots: {
 alt.log(`alt:V Server - Boilerplate Started`);
 alt.on('playerConnect', handlePlayerConnect);
 
+const maxIndex = 25;
+let someIndex = 0;
+
 function handlePlayerConnect(player: alt.Player) {
     alt.log(`[${player.id}] ${player.name} has connected to the server.`);
 
-    player.model = 'mp_f_freemode_01';
-    player.spawn(-1158.92, -470.97, 56.64, 0);
-    player.setClothes(6, 5, 0, 0);
-    player.setHeadBlendData(45, 45, 45, 31, 31, 31, 1, 1, 1);
     player.setDateTime(1, 1, 2022, 14, 0, 0);
     player.setWeather(2);
 
-    // Hide Torso
+    // Hide Body -- FEMALE
+    player.model = 'mp_f_freemode_01';
+    player.setHeadBlendData(45, 45, 45, 31, 31, 31, 1, 1, 1);
+    player.setClothes(6, 5, 0, 0); // Shoes
     player.setClothes(3, 8, 0, 0); // Torso
-    player.setClothes(8, 14, 0, 0); // Undershirt
+    player.setClothes(8, 10, 0, 0); // Undershirt
     player.setClothes(4, 13, 0, 0); // Legs
+    // player.setClothes(11, 82, 0, 0); // Top
+
+    // Hide Body -- MALE
+    // player.model = 'mp_m_freemode_01';
+    // player.setHeadBlendData(0, 0, 0, 31, 31, 31, 1, 1, 1);
+    // player.setClothes(6, 5, 0, 0); // Shoes
+    // player.setClothes(3, 3, 0, 0); // Torso
+    // player.setClothes(8, 15, 0, 0); // Undershirt
+    // player.setClothes(4, 11, 0, 0); // Legs
+    // player.setClothes(11, 15, 0, 0); // Top
+
+    player.spawn(-1158.92, -470.97, 56.64, 0);
 
     alt.emitClient(player, 'log:Console', 'alt:V Server - Boilerplate Started');
 }
-
-const maxIndex = 414;
-let someIndex = 0;
 
 async function sleep(ms: number) {
     return new Promise((resolve: Function) => {
@@ -44,7 +55,10 @@ async function sleep(ms: number) {
 async function updateAsset(player: alt.Player) {
     await sleep(1);
 
-    player.setClothes(11, someIndex, 0, 0);
+    try {
+        player.setClothes(11, someIndex, 0, 0);
+        // player.setProp(7, someIndex, 0);
+    } catch (err) {}
 
     await sleep(50);
 

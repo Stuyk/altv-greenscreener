@@ -21,10 +21,32 @@ alt.on('keyup', async (key: number) => {
         return;
     }
 
+    // Leave this alone
+    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
+
+    await sleep(100);
+
     console.log(native.getEntityHeading(alt.Player.local.scriptID));
     console.log(JSON.stringify(native.getEntityRotation(alt.Player.local.scriptID, 2)));
 
+    native.setEntityCoordsNoOffset(
+        alt.Player.local.scriptID,
+        alt.Player.local.pos.x,
+        alt.Player.local.pos.y,
+        alt.Player.local.pos.z + 2,
+        false,
+        false,
+        false
+    );
+
+    await new Promise((resolve: Function) => {
+        alt.setTimeout(() => {
+            resolve();
+        }, 100);
+    });
+
     pos = alt.Player.local.pos;
+
     const fwd = native.getEntityForwardVector(alt.Player.local.scriptID);
     const fwdPos = {
         x: alt.Player.local.pos.x + fwd.x * 1.2,
@@ -40,7 +62,7 @@ alt.on('keyup', async (key: number) => {
         0,
         0,
         0,
-        40,
+        20,
         true,
         0
     );
@@ -49,33 +71,40 @@ alt.on('keyup', async (key: number) => {
     native.setCamActive(cam, true);
     native.renderScriptCams(true, false, 0, true, false, 0);
 
-    // native.taskPlayAnim(alt.Player.local.scriptID, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 49, 0, false, false, false);
-
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z + 0.01, false, false, false);
+    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
+    // native.setEntityRotation(alt.Player.local.scriptID, 0, 0, 20.996076583862305, 2, false);
+    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
     native.freezeEntityPosition(alt.Player.local.scriptID, true);
-    native.setEntityRotation(
-        alt.Player.local.scriptID,
-        0.015785740688443184,
-        -0.003576904069632292,
-        -162.2259063720703,
-        2,
-        false
-    );
+
+    await sleep(200);
 
     alt.emitServer('updateAsset');
 });
 
+async function sleep(ms: number) {
+    return new Promise((resolve: Function) => {
+        alt.setTimeout(() => {
+            resolve();
+        }, ms);
+    });
+}
+
 alt.onServer('takeScreenshot', async () => {
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z + 0.05, false, false, false);
+    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
     native.freezeEntityPosition(alt.Player.local.scriptID, true);
+    // native.taskPlayAnim(alt.Player.local.scriptID, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 18, 1, false, false, true);
     native.setEntityRotation(
         alt.Player.local.scriptID,
-        0.015785740688443184,
-        -0.003576904069632292,
-        -162.2259063720703,
+        0,
+        0,
+        -165,
         2,
         false
+        /* It's setting the player's rotation. */
     );
+
+    // const duration = native.getAnimDuration('nm@hands', 'hands_up');
+    // await sleep(duration * 10000);
 
     const result = await alt.takeScreenshot();
     const data = AthenaBuffer.toBuffer(result);
