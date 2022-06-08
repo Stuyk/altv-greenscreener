@@ -24,7 +24,7 @@ alt.on('keyup', async (key: number) => {
     // Leave this alone
     native.setEntityRotation(alt.Player.local, 0, 0, -165, 2, false);
 
-    await sleep(100);
+    await alt.Utils.wait(100);
 
     console.log(native.getEntityHeading(alt.Player.local));
     console.log(JSON.stringify(native.getEntityRotation(alt.Player.local, 2)));
@@ -39,11 +39,7 @@ alt.on('keyup', async (key: number) => {
         false
     );
 
-    await new Promise((resolve: Function) => {
-        alt.setTimeout(() => {
-            resolve();
-        }, 100);
-    });
+    await alt.Utils.wait(100);
 
     pos = alt.Player.local.pos;
 
@@ -76,18 +72,10 @@ alt.on('keyup', async (key: number) => {
     native.setEntityRotation(alt.Player.local, 0, 0, -165, 2, false);
     native.freezeEntityPosition(alt.Player.local, true);
 
-    await sleep(200);
+    await alt.Utils.wait(200);
 
     alt.emitServer('updateAsset');
 });
-
-async function sleep(ms: number) {
-    return new Promise((resolve: Function) => {
-        alt.setTimeout(() => {
-            resolve();
-        }, ms);
-    });
-}
 
 alt.onServer('takeScreenshot', async () => {
     native.setEntityCoordsNoOffset(alt.Player.local, pos.x, pos.y, pos.z, false, false, false);
