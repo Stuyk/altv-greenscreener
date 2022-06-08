@@ -11,7 +11,7 @@ function handleLogConsole(msg: string) {
     alt.log(msg);
 }
 
-native.freezeEntityPosition(alt.Player.local.scriptID, false);
+native.freezeEntityPosition(alt.Player.local, false);
 native.displayRadar(false);
 
 let pos;
@@ -22,15 +22,15 @@ alt.on('keyup', async (key: number) => {
     }
 
     // Leave this alone
-    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
+    native.setEntityRotation(alt.Player.local, 0, 0, -165, 2, false);
 
     await sleep(100);
 
-    console.log(native.getEntityHeading(alt.Player.local.scriptID));
-    console.log(JSON.stringify(native.getEntityRotation(alt.Player.local.scriptID, 2)));
+    console.log(native.getEntityHeading(alt.Player.local));
+    console.log(JSON.stringify(native.getEntityRotation(alt.Player.local, 2)));
 
     native.setEntityCoordsNoOffset(
-        alt.Player.local.scriptID,
+        alt.Player.local,
         alt.Player.local.pos.x,
         alt.Player.local.pos.y,
         alt.Player.local.pos.z + 2,
@@ -47,7 +47,7 @@ alt.on('keyup', async (key: number) => {
 
     pos = alt.Player.local.pos;
 
-    const fwd = native.getEntityForwardVector(alt.Player.local.scriptID);
+    const fwd = native.getEntityForwardVector(alt.Player.local);
     const fwdPos = {
         x: alt.Player.local.pos.x + fwd.x * 1.2,
         y: alt.Player.local.pos.y + fwd.y * 1.2,
@@ -71,10 +71,10 @@ alt.on('keyup', async (key: number) => {
     native.setCamActive(cam, true);
     native.renderScriptCams(true, false, 0, true, false, 0);
 
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
-    // native.setEntityRotation(alt.Player.local.scriptID, 0, 0, 20.996076583862305, 2, false);
-    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
-    native.freezeEntityPosition(alt.Player.local.scriptID, true);
+    native.setEntityCoordsNoOffset(alt.Player.local, pos.x, pos.y, pos.z, false, false, false);
+    // native.setEntityRotation(alt.Player.local, 0, 0, 20.996076583862305, 2, false);
+    native.setEntityRotation(alt.Player.local, 0, 0, -165, 2, false);
+    native.freezeEntityPosition(alt.Player.local, true);
 
     await sleep(200);
 
@@ -90,11 +90,11 @@ async function sleep(ms: number) {
 }
 
 alt.onServer('takeScreenshot', async () => {
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
-    native.freezeEntityPosition(alt.Player.local.scriptID, true);
-    // native.taskPlayAnim(alt.Player.local.scriptID, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 18, 1, false, false, true);
+    native.setEntityCoordsNoOffset(alt.Player.local, pos.x, pos.y, pos.z, false, false, false);
+    native.freezeEntityPosition(alt.Player.local, true);
+    // native.taskPlayAnim(alt.Player.local, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 18, 1, false, false, true);
     native.setEntityRotation(
-        alt.Player.local.scriptID,
+        alt.Player.local,
         0,
         0,
         -165,
