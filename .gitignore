@@ -11,3 +11,6 @@ data/
 cache/
 crashdumps/
 package-lock.json
+screenshots/*.png
+screenshots-output/*.png
+output/*

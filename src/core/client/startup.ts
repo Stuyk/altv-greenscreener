@@ -1,116 +1,170 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
 import { AthenaBuffer } from '../shared/athenaBuffer';
+import { CameraInfo } from '../shared/interfaces';
 
-alt.onServer('log:Console', handleLogConsole);
+const greenScreenPosition = { x: -1159.2740478515625, y: -468.6954650878906, z: 55.2 };
+const greenScreenRotation = { x: 0, y: 0, z: -165 };
 
-native.requestAnimDict('nm@hands');
-native.requestAnimDict('mp_character_creation@lineup@male_a');
+let cam;
+let camInfo: CameraInfo;
 
-function handleLogConsole(msg: string) {
-    alt.log(msg);
-}
-
-native.freezeEntityPosition(alt.Player.local.scriptID, false);
-native.displayRadar(false);
-
-let pos;
-
-alt.on('keyup', async (key: number) => {
-    if (key !== 89) {
-        return;
+class GreenScreener {
+    static init() {
+        alt.onServer('takeScreenshot', GreenScreener.screenshot);
+        alt.onServer('setup', GreenScreener.setup);
+        alt.on('keyup', GreenScreener.keyup);
     }
 
-    // Leave this alone
-    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
+    private static setup() {
+        native.freezeEntityPosition(alt.Player.local.scriptID, false);
+        native.displayRadar(false);
+    }
 
-    await sleep(100);
+    private static async keyup(key: number) {
+        if (key !== 89) {
+            return;
+        }
 
-    console.log(native.getEntityHeading(alt.Player.local.scriptID));
-    console.log(JSON.stringify(native.getEntityRotation(alt.Player.local.scriptID, 2)));
+        native.setEntityRotation(
+            alt.Player.local.scriptID,
+            greenScreenRotation.x,
+            greenScreenRotation.y,
+            greenScreenRotation.z,
+            2,
+            false
+        );
 
-    native.setEntityCoordsNoOffset(
-        alt.Player.local.scriptID,
-        alt.Player.local.pos.x,
-        alt.Player.local.pos.y,
-        alt.Player.local.pos.z + 2,
-        false,
-        false,
-        false
-    );
+        await alt.Utils.wait(100);
 
-    await new Promise((resolve: Function) => {
-        alt.setTimeout(() => {
-            resolve();
-        }, 100);
-    });
+        native.setEntityCoordsNoOffset(
+            alt.Player.local.scriptID,
+            greenScreenPosition.x,
+            greenScreenPosition.y,
+            greenScreenPosition.z,
+            false,
+            false,
+            false
+        );
 
-    pos = alt.Player.local.pos;
+        await alt.Utils.wait(50);
 
-    const fwd = native.getEntityForwardVector(alt.Player.local.scriptID);
-    const fwdPos = {
-        x: alt.Player.local.pos.x + fwd.x * 1.2,
-        y: alt.Player.local.pos.y + fwd.y * 1.2,
-        z: alt.Player.local.pos.z + 0.15,
-    };
+        alt.emitServer('updateAsset');
+    }
 
-    const cam = native.createCamWithParams(
-        'DEFAULT_SCRIPTED_CAMERA',
-        fwdPos.x,
-        fwdPos.y,
-        fwdPos.z,
-        0,
-        0,
-        0,
-        20,
-        true,
-        0
-    );
+    private static async screenshot(cameraInfo: CameraInfo) {
+        let testing = false;
+        if (!cameraInfo) {
+            testing = true;
+            cameraInfo = {
+                fov: 20,
+                rotation: {
+                    x: 0,
+                    y: 0,
+                    z: -247.5,
+                },
+                zPos: 0,
+            };
+        }
 
-    native.pointCamAtCoord(cam, alt.Player.local.pos.x, alt.Player.local.pos.y, alt.Player.local.pos.z + 0.15);
-    native.setCamActive(cam, true);
-    native.renderScriptCams(true, false, 0, true, false, 0);
+        if (!camInfo || camInfo.zPos !== cameraInfo.zPos) {
+            camInfo = cameraInfo;
 
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
-    // native.setEntityRotation(alt.Player.local.scriptID, 0, 0, 20.996076583862305, 2, false);
-    native.setEntityRotation(alt.Player.local.scriptID, 0, 0, -165, 2, false);
-    native.freezeEntityPosition(alt.Player.local.scriptID, true);
+            if (cam) {
+                native.destroyAllCams(true);
+                native.destroyCam(cam, true);
+                cam = undefined;
+            }
 
-    await sleep(200);
+            native.freezeEntityPosition(alt.Player.local.scriptID, false);
+            native.setEntityCoordsNoOffset(
+                alt.Player.local.scriptID,
+                greenScreenPosition.x,
+                greenScreenPosition.y,
+                greenScreenPosition.z,
+                false,
+                false,
+                false
+            );
 
-    alt.emitServer('updateAsset');
-});
+            native.setEntityRotation(
+                alt.Player.local.scriptID,
+                greenScreenRotation.x,
+                greenScreenRotation.y,
+                greenScreenRotation.z,
+                2,
+                false
+            );
 
-async function sleep(ms: number) {
-    return new Promise((resolve: Function) => {
-        alt.setTimeout(() => {
-            resolve();
-        }, ms);
-    });
+            native.freezeEntityPosition(alt.Player.local.scriptID, true);
+
+            const fwd = native.getEntityForwardVector(alt.Player.local.scriptID);
+            const fwdPos = {
+                x: alt.Player.local.pos.x + fwd.x * 1.2,
+                y: alt.Player.local.pos.y + fwd.y * 1.2,
+                z: alt.Player.local.pos.z + camInfo.zPos,
+            };
+
+            cam = native.createCamWithParams(
+                'DEFAULT_SCRIPTED_CAMERA',
+                fwdPos.x,
+                fwdPos.y,
+                fwdPos.z,
+                0,
+                0,
+                0,
+                camInfo.fov,
+                true,
+                0
+            );
+
+            native.pointCamAtCoord(
+                cam,
+                alt.Player.local.pos.x,
+                alt.Player.local.pos.y,
+                alt.Player.local.pos.z + camInfo.zPos
+            );
+            native.setCamActive(cam, true);
+            native.renderScriptCams(true, false, 0, true, false, 0);
+        }
+
+        await alt.Utils.wait(50);
+
+        native.freezeEntityPosition(alt.Player.local.scriptID, false);
+
+        native.setEntityCoordsNoOffset(
+            alt.Player.local.scriptID,
+            greenScreenPosition.x,
+            greenScreenPosition.y,
+            greenScreenPosition.z,
+            false,
+            false,
+            false
+        );
+
+        native.setEntityRotation(
+            alt.Player.local.scriptID,
+            camInfo.rotation.x,
+            camInfo.rotation.y,
+            camInfo.rotation.z,
+            2,
+            false
+        );
+
+        native.freezeEntityPosition(alt.Player.local.scriptID, true);
+
+        if (testing) {
+            return;
+        }
+
+        const result = await alt.takeScreenshot();
+        const data = AthenaBuffer.toBuffer(result);
+        const totalLength = data.length;
+
+        for (let i = 0; i < totalLength; i++) {
+            alt.emitServer('handleScreenshot', data[i], i, totalLength);
+        }
+    }
 }
 
-alt.onServer('takeScreenshot', async () => {
-    native.setEntityCoordsNoOffset(alt.Player.local.scriptID, pos.x, pos.y, pos.z, false, false, false);
-    native.freezeEntityPosition(alt.Player.local.scriptID, true);
-    // native.taskPlayAnim(alt.Player.local.scriptID, 'nm@hands', 'hands_up', 8.0, 8.0, -1, 18, 1, false, false, true);
-    native.setEntityRotation(
-        alt.Player.local.scriptID,
-        0,
-        0,
-        -165,
-        2,
-        false
-        /* It's setting the player's rotation. */
-    );
-
-    // const duration = native.getAnimDuration('nm@hands', 'hands_up');
-    // await sleep(duration * 10000);
-
-    const result = await alt.takeScreenshot();
-    const data = AthenaBuffer.toBuffer(result);
-    const totalLength = data.length;
-
-    for (let i = 0; i < totalLength; i++) {
-        alt.emitServer('handleScreenshot', data[i], i, totalLength);
-    }
-});
+GreenScreener.init();
