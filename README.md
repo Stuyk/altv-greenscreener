@@ -1,6 +1,8 @@
 
 ## alt:V Clothing Green Screener
 
+[Support on Patreon. Seriously.](https://patreon.com/stuyk/)
+
 Ever want screenshots of every single clothing item in GTA:V?
 
 Well this is your repository.
