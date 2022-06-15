@@ -63,6 +63,14 @@ Press `y` and don't touch your computer.
 
 Screenshots will be output to `screenshots`.
 
+# Option 1 - Let Stuyk Process Them
+
+Pay me and I'll process the images for you in a timely manner.
+
+# Option 2 - Further Processing
+
+Not accurate, not great, but it'll work.
+
 ## Further Processing
 
 Use the [https://github.com/danielgatis/rembg](https://github.com/danielgatis/rembg) repository to process image backgrounds and remove them.
