@@ -67,7 +67,7 @@ Screenshots will be output to `screenshots`.
 
 Pay me and I'll process the images for you in a timely manner.
 
-Stuyk#0001
+Discord: `Stuyk#0001`
 
 # Option 2 - Further Processing
 
